@@ -161,7 +161,39 @@ aider --model ollama_chat/qwen2.5-coder:14b \
 - `--no-auto-commits` — Prevents automatic git commits (review changes yourself)
 - `--map-tokens 2048` — Repo map budget; 2048 is a good balance with 14B's context capacity
 
-**Suppress model warnings.** Aider doesn't know about local Ollama models and will warn about "Unknown context window size." Create `~/.aider.model.settings.yml` to fix this:
+**Suppress model warnings.** Aider may warn: "Unknown context window size and costs, using sane defaults."
+This is harmless. To suppress it reliably, use both:
+- `.aider.model.metadata.json` (registers context/cost metadata and suppresses the warning)
+- `.aider.model.settings.yml` (sets edit format and `num_ctx`)
+
+If you run Aider from this repo root, these files are picked up automatically. For other projects, copy both files.
+
+Example metadata file:
+
+```json
+{
+  "ollama_chat/qwen2.5-coder:14b": {
+    "max_tokens": 4096,
+    "max_input_tokens": 16384,
+    "max_output_tokens": 4096,
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0,
+    "litellm_provider": "ollama_chat",
+    "mode": "chat"
+  },
+  "openai/qwen-local": {
+    "max_tokens": 4096,
+    "max_input_tokens": 12288,
+    "max_output_tokens": 4096,
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0,
+    "litellm_provider": "openai",
+    "mode": "chat"
+  }
+}
+```
+
+Example settings file:
 
 ```yaml
 - name: ollama_chat/qwen2.5-coder:14b
@@ -185,7 +217,7 @@ aider --model ollama_chat/qwen2.5-coder:14b \
     num_ctx: 8192
 ```
 
-This tells Aider the correct context window for each model and sets `diff` edit format (more token-efficient than the default `whole` format for local models).
+The metadata file is what suppresses the warning; the settings file controls model behavior.
 
 ### Option B: OpenCode
 
