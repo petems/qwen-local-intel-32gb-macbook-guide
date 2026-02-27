@@ -1,5 +1,7 @@
 # qwen-local-intel-32gb-macbook-guide
 
+> Looking to run on a Silicon/M1 macbook? https://github.com/petems/qwen-local-silicon-32to64gb-macbook-guide
+
 A practical guide to running a local coding assistant on a 32GB Intel MacBook Pro.
 
 ## Your hardware and what it can do
