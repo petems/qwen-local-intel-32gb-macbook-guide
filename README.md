@@ -383,6 +383,66 @@ ollama create qwen2.5-coder:14b-custom -f Modelfile-qwen14b
 
 Then use `qwen2.5-coder:14b-custom` in your agent. Lower temperature (0.1-0.3) tends to produce more reliable code output.
 
+### Optional: direct `llama-server` tuning (llama.cpp)
+
+If you want explicit control over quantization, context, batching, and CPU behavior, run `llama-server` directly instead of Ollama.
+
+```bash
+# Install llama.cpp binaries (includes llama-server)
+brew install llama.cpp
+```
+
+Quick start with a Hugging Face GGUF build:
+
+```bash
+# 14B quality profile (recommended starting point)
+llama-server \
+  -hf bartowski/Qwen2.5-Coder-14B-Instruct-GGUF:Q4_K_M \
+  --ctx-size 12288 \
+  --threads 4 \
+  --batch-size 256 \
+  --ubatch-size 64 \
+  --n-gpu-layers 0 \
+  --host 127.0.0.1 \
+  --port 8080
+```
+
+Alternative fast profile for 7B:
+
+```bash
+llama-server \
+  -hf bartowski/Qwen2.5-Coder-7B-Instruct-GGUF:Q4_K_M \
+  --ctx-size 16384 \
+  --threads 4 \
+  --batch-size 512 \
+  --ubatch-size 128 \
+  --n-gpu-layers 0 \
+  --host 127.0.0.1 \
+  --port 8080
+```
+
+Avoid using very large default contexts on this hardware; set `--ctx-size` explicitly for predictable memory use.
+
+Why these defaults make sense on 32GB Intel:
+- `--ctx-size 12288` (14B): practical ceiling before memory pressure becomes noticeable
+- `--threads 4`: match physical cores, not hyperthreads
+- `--batch-size` / `--ubatch-size`: set conservatively for CPU latency and stability
+- `--n-gpu-layers 0`: Intel integrated graphics are not useful for llama.cpp offload
+
+Key flags to tune first:
+
+| Flag | Intel 32GB guidance |
+|---|---|
+| `--ctx-size` | 14B: `8192-12288`, 7B: `16384-32768` |
+| `--threads` | Keep at `4` (physical cores) |
+| `--batch-size` | Start `256` on 14B, `512` on 7B |
+| `--ubatch-size` | Start `64` on 14B, `128` on 7B |
+| `--n-gpu-layers` | Keep `0` on Intel iGPU systems |
+
+If memory pressure rises, reduce `--ctx-size` first, then lower `--batch-size`.
+
+You can use OpenAI-compatible clients against `llama-server` too (base URL typically `http://127.0.0.1:8080/v1`).
+
 ### Context window guidance
 
 | Model | Comfortable context | Max practical | Notes |
