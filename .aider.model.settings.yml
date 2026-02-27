@@ -30,3 +30,8 @@
   edit_format: diff
   extra_params:
     num_ctx: 12288
+
+- name: openai/qwen-local-fast
+  edit_format: diff
+  extra_params:
+    num_ctx: 8192

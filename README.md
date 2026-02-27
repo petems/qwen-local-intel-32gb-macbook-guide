@@ -152,6 +152,25 @@ aider --model ollama_chat/qwen2.5-coder:14b
 
 Aider will connect to Ollama on localhost automatically. You can start editing files right away — just add files to the chat and describe what you want changed.
 
+If you are running `llama-server` on port `8080` instead:
+
+```bash
+aider \
+  --model openai/qwen-local \
+  --openai-api-base http://localhost:8080/v1 \
+  --openai-api-key not-needed
+```
+
+For lower latency on Intel CPU, use the fast local profile (smaller context):
+
+```bash
+aider \
+  --model openai/qwen-local-fast \
+  --openai-api-base http://localhost:8080/v1 \
+  --openai-api-key not-needed \
+  --map-tokens 512
+```
+
 **Useful flags:**
 
 ```bash
@@ -191,6 +210,15 @@ Example metadata file:
     "output_cost_per_token": 0,
     "litellm_provider": "openai",
     "mode": "chat"
+  },
+  "openai/qwen-local-fast": {
+    "max_tokens": 4096,
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0,
+    "litellm_provider": "openai",
+    "mode": "chat"
   }
 }
 ```
@@ -214,6 +242,16 @@ Example settings file:
     num_ctx: 16384
 
 - name: ollama_chat/qwen3.5:35b-a3b
+  edit_format: diff
+  extra_params:
+    num_ctx: 8192
+
+- name: openai/qwen-local
+  edit_format: diff
+  extra_params:
+    num_ctx: 12288
+
+- name: openai/qwen-local-fast
   edit_format: diff
   extra_params:
     num_ctx: 8192
@@ -351,6 +389,25 @@ cat src/api.py | llm -m qwen2.5-coder:7b "Add docstrings to all functions in thi
 ```
 
 Use 7B for `llm` tasks — speed matters more than peak quality for one-liners, and 7B responds in seconds.
+
+For very low-latency one-off prompts, use explicit Ollama options:
+
+```bash
+$ llm -m qwen2.5-coder:7b "Write me a haiku about cheese" --no-stream -o num_ctx 2048 -o num_predict 80
+Melted in the sun,
+A golden, creamy delight,
+Cheese dances on my tongue.
+```
+
+What these options do:
+- `--no-stream`: returns one final response instead of token-by-token streaming. This reduces terminal overhead and makes short prompts feel snappier.
+- `-o num_ctx 2048`: sets the context window to 2048 tokens for this request. Smaller context means less prompt-processing work, which improves first-token latency on CPU.
+- `-o num_predict 80`: caps generation length to 80 tokens. This prevents the model from producing long answers when you only need something short.
+
+Tuning guidance:
+- If responses are still slow, lower `num_ctx` to `1024` for tiny prompts.
+- If answers get cut off, increase `num_predict` to `120-200`.
+- Use larger `num_ctx` only when you are passing bigger files or long chat history.
 
 ### Model naming across tools
 
