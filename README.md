@@ -1,12 +1,10 @@
-# Local AI Coding Agent on a 32GB Intel MacBook
+# qwen-local-intel-32gb-macbook-guide
 
-A practical guide to running a local coding assistant on a 32GB Intel MacBook Pro. Based on the [Qwen3-Coder-Next guide](https://dev.to/sienna/qwen3-coder-next-the-complete-2026-guide-to-running-powerful-ai-coding-agents-locally-1k95), adapted for your actual hardware: 32GB RAM, an Intel i7 with AVX-512, and no Apple Silicon — but plenty capable of running 14B coding models that produce genuinely useful output.
-
----
+A practical guide to running a local coding assistant on a 32GB Intel MacBook Pro.
 
 ## Your hardware and what it can do
 
-The original guide targets 64GB Apple Silicon Macs and RTX 5090s. Your 32GB Intel MacBook **cannot run Qwen3-Coder-Next** — it's an 80B parameter model that needs 26GB+ even at the most aggressive quantization. But with 32GB, you can comfortably run 14B parameter models — a massive quality upgrade over the 7B class.
+A 32GB Intel MacBook **cannot run Qwen3-Coder-Next** — it's an 80B parameter model that needs 26GB+ even at the most aggressive quantization. But with 32GB, you can comfortably run 14B parameter models — a massive quality upgrade over the 7B class.
 
 **What you're working with:**
 - 32GB LPDDR4X RAM (~59.7 GB/s bandwidth)
@@ -511,3 +509,7 @@ Expected under sustained load. Use a cooling pad or elevated stand, ensure vents
 - [Qwen 2.5 Coder](https://ollama.com/library/qwen2.5-coder) — Model family page
 - [Qwen 3.5 35B-A3B on Ollama](https://ollama.com/library/qwen3.5:35b-a3b) — Experimental MoE model
 - [Original Qwen3-Coder-Next guide](https://dev.to/sienna/qwen3-coder-next-the-complete-2026-guide-to-running-powerful-ai-coding-agents-locally-1k95) — For when you upgrade your hardware
+
+## Inspiration and Context
+
+Inspired by the [Qwen3-Coder-Next guide](https://dev.to/sienna/qwen3-coder-next-the-complete-2026-guide-to-running-powerful-ai-coding-agents-locally-1k95), adapted for two devices I own in terms of Macbooks, this one for my older machine: 32GB RAM, an Intel i7 with AVX-512, and no Apple Silicon — but plenty capable of running 14B coding models that produce genuinely useful output.
